@@ -1,5 +1,5 @@
 # mock-aa-setup
-Docker containers to hold mock singleton paymaster + helpers to setup local AA environment
+Docker containers to hold mock singleton paymaster + helpers to setup local AA environment.
 
 ## Setup
 
