@@ -29,7 +29,7 @@ services:
         condition: service_completed_successfully
 
   alto:
-    image: ghcr.io/pimlicolabs/alto:latest
+    image: ghcr.io/mdtanrikulu/alto:latest
     ports: [ "4337:4337" ]
     environment:
       - ANVIL_RPC=http://anvil:8545
