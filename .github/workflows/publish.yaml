@@ -13,10 +13,10 @@ jobs:
         include:
           - context: ./mock-contract-deployer
             dockerfile: ./mock-contract-deployer/Dockerfile
-            image: ghcr.io/pimlicolabs/mock-contract-deployer
+            image: ghcr.io/mdtanrikulu/mock-contract-deployer
           - context: ./mock-verifying-paymaster
             dockerfile: ./mock-verifying-paymaster/Dockerfile
-            image: ghcr.io/pimlicolabs/mock-verifying-paymaster
+            image: ghcr.io/mdtanrikulu/mock-verifying-paymaster
     permissions:
       contents: read
       packages: write
