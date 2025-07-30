@@ -145,325 +145,219 @@ const main = async () => {
 	}
 
 	// Get current nonce from chain to support pre-existing state
-	let nonce = await client.getTransactionCount({
+	let currentNonce = await client.getTransactionCount({
 		address: walletClient.account.address,
 	});
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: ENTRY_POINT_V08_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[V0.8 CORE] Deploying EntryPoint"));
+	// Helper function to send transaction and wait for receipt
+	const sendAndWaitForTransaction = async (txParams: any, label: string) => {
+		try {
+			console.log(`Sending: ${label}`);
+			const hash = await walletClient.sendTransaction({
+				...txParams,
+				nonce: currentNonce++,
+				chain,
+			});
+			await client.waitForTransactionReceipt({ hash, timeout: 60_000 });
+			console.log(`✓ ${label}`);
+		} catch (error) {
+			console.error(`✗ Failed: ${label}`, error);
+			throw error;
+		}
+	};
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: SIMPLE_ACCOUNT_FACTORY_V08_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[V0.8 CORE] Deploying SimpleAccountFactory"));
+	// Deploy all contracts sequentially
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: ENTRY_POINT_V08_CREATECALL,
+		gas: 15_000_000n,
+	}, "[V0.8 CORE] EntryPoint");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: ENTRY_POINT_V07_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[V0.7 CORE] Deploying EntryPoint"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: SIMPLE_ACCOUNT_FACTORY_V08_CREATECALL,
+		gas: 15_000_000n,
+	}, "[V0.8 CORE] SimpleAccountFactory");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: SIMPLE_ACCOUNT_FACTORY_V07_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[V0.7 CORE] Deploying SimpleAccountFactory"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: ENTRY_POINT_V07_CREATECALL,
+		gas: 15_000_000n,
+	}, "[V0.7 CORE] EntryPoint");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: ENTRY_POINT_SIMULATIONS_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[V0.7 CORE] Deploying EntryPointSimulations"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: SIMPLE_ACCOUNT_FACTORY_V07_CREATECALL,
+		gas: 15_000_000n,
+	}, "[V0.7 CORE] SimpleAccountFactory");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: ENTRY_POINT_V06_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[V0.6 CORE] Deploying EntryPoint"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: ENTRY_POINT_SIMULATIONS_CREATECALL,
+		gas: 15_000_000n,
+	}, "[V0.7 CORE] EntryPointSimulations");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: SIMPLE_ACCOUNT_FACTORY_V06_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[V0.6 CORE] Deploying SimpleAccountFactory"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: ENTRY_POINT_V06_CREATECALL,
+		gas: 15_000_000n,
+	}, "[V0.6 CORE] EntryPoint");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: SAFE_V06_MODULE_SETUP_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[SAFE V0.6] Deploying Safe Module Setup"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: SIMPLE_ACCOUNT_FACTORY_V06_CREATECALL,
+		gas: 15_000_000n,
+	}, "[V0.6 CORE] SimpleAccountFactory");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: SAFE_V06_MODULE_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[SAFE V0.6] Deploying Safe 4337 Module"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: SAFE_V06_MODULE_SETUP_CREATECALL,
+		gas: 15_000_000n,
+	}, "[SAFE V0.6] Safe Module Setup");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: SAFE_V07_MODULE_SETUP_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[SAFE V0.7] Deploying Safe Module Setup"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: SAFE_V06_MODULE_CREATECALL,
+		gas: 15_000_000n,
+	}, "[SAFE V0.6] Safe 4337 Module");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: SAFE_V07_MODULE_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[SAFE V0.7] Deploying Safe 4337 Module"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: SAFE_V07_MODULE_SETUP_CREATECALL,
+		gas: 15_000_000n,
+	}, "[SAFE V0.7] Safe Module Setup");
 
-	await anvilClient
-		.setCode({
-			address: SAFE_SINGLETON_FACTORY,
-			bytecode: SAFE_SINGLETON_FACTORY_BYTECODE,
-		})
-		.then(() => console.log("[SAFE] Etched Safe Singleton Factory Bytecode"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: SAFE_V07_MODULE_CREATECALL,
+		gas: 15_000_000n,
+	}, "[SAFE V0.7] Safe 4337 Module");
 
-	walletClient
-		.sendTransaction({
-			to: SAFE_SINGLETON_FACTORY,
-			data: SAFE_PROXY_FACTORY_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[SAFE] Deploying Safe Proxy Factory"));
+	// Etch Safe Singleton Factory bytecode
+	console.log("Etching: [SAFE] Safe Singleton Factory Bytecode");
+	await anvilClient.setCode({
+		address: SAFE_SINGLETON_FACTORY,
+		bytecode: SAFE_SINGLETON_FACTORY_BYTECODE,
+	});
+	console.log("✓ [SAFE] Safe Singleton Factory Bytecode");
 
-	walletClient
-		.sendTransaction({
-			to: SAFE_SINGLETON_FACTORY,
-			data: SAFE_SINGLETON_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[SAFE] Deploying Safe Singleton"));
+	await sendAndWaitForTransaction({
+		to: SAFE_SINGLETON_FACTORY,
+		data: SAFE_PROXY_FACTORY_CREATECALL,
+		gas: 15_000_000n,
+	}, "[SAFE] Safe Proxy Factory");
 
-	walletClient
-		.sendTransaction({
-			to: SAFE_SINGLETON_FACTORY,
-			data: SAFE_MULTI_SEND_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[SAFE] Deploying Safe Multi Send"));
+	await sendAndWaitForTransaction({
+		to: SAFE_SINGLETON_FACTORY,
+		data: SAFE_SINGLETON_CREATECALL,
+		gas: 15_000_000n,
+	}, "[SAFE] Safe Singleton");
 
-	walletClient
-		.sendTransaction({
-			to: SAFE_SINGLETON_FACTORY,
-			data: SAFE_MULTI_SEND_CALL_ONLY_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[SAFE] Deploying Safe Multi Send Call Only"));
+	await sendAndWaitForTransaction({
+		to: SAFE_SINGLETON_FACTORY,
+		data: SAFE_MULTI_SEND_CREATECALL,
+		gas: 15_000_000n,
+	}, "[SAFE] Safe Multi Send");
 
-	await anvilClient
-		.setCode({
-			address: BICONOMY_SINGLETON_FACTORY,
-			bytecode: BICONOMY_SINGLETON_FACTORY_BYTECODE,
-		})
-		.then(() => console.log("[BICONOMY] Etched Singleton Factory Bytecode"));
+	await sendAndWaitForTransaction({
+		to: SAFE_SINGLETON_FACTORY,
+		data: SAFE_MULTI_SEND_CALL_ONLY_CREATECALL,
+		gas: 15_000_000n,
+	}, "[SAFE] Safe Multi Send Call Only");
 
-	walletClient
-		.sendTransaction({
-			to: BICONOMY_SINGLETON_FACTORY,
-			data: BICONOMY_ECDSA_OWNERSHIP_REGISTRY_MOUDULE_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() =>
-			console.log("[BICONOMY] Deployed ECDSA Ownership Registry Module"),
-		);
+	// Etch Biconomy Singleton Factory bytecode
+	console.log("Etching: [BICONOMY] Biconomy Singleton Factory Bytecode");
+	await anvilClient.setCode({
+		address: BICONOMY_SINGLETON_FACTORY,
+		bytecode: BICONOMY_SINGLETON_FACTORY_BYTECODE,
+	});
+	console.log("✓ [BICONOMY] Biconomy Singleton Factory Bytecode");
 
-	walletClient
-		.sendTransaction({
-			to: BICONOMY_SINGLETON_FACTORY,
-			data: BICONOMY_ACCOUNT_V2_LOGIC_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[BICONOMY] Deploying Account V0.2 Logic"));
+	await sendAndWaitForTransaction({
+		to: BICONOMY_SINGLETON_FACTORY,
+		data: BICONOMY_ECDSA_OWNERSHIP_REGISTRY_MOUDULE_CREATECALL,
+		gas: 15_000_000n,
+	}, "[BICONOMY] ECDSA Ownership Registry Module");
 
-	walletClient
-		.sendTransaction({
-			to: BICONOMY_SINGLETON_FACTORY,
-			data: BICONOMY_FACTORY_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[BICONOMY] Deploying Factory"));
+	await sendAndWaitForTransaction({
+		to: BICONOMY_SINGLETON_FACTORY,
+		data: BICONOMY_ACCOUNT_V2_LOGIC_CREATECALL,
+		gas: 15_000_000n,
+	}, "[BICONOMY] Account V0.2 Logic");
 
-	walletClient
-		.sendTransaction({
-			to: BICONOMY_SINGLETON_FACTORY,
-			data: BICONOMY_DEFAULT_FALLBACK_HANDLER_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[BICONOMY] Deploying Default Fallback Handler"));
+	await sendAndWaitForTransaction({
+		to: BICONOMY_SINGLETON_FACTORY,
+		data: BICONOMY_FACTORY_CREATECALL,
+		gas: 15_000_000n,
+	}, "[BICONOMY] Factory");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: KERNEL_V06_ECDSA_VALIDATOR_V2_2_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[KERNEL] Deploying V0.6 ECDSA Validator"));
+	await sendAndWaitForTransaction({
+		to: BICONOMY_SINGLETON_FACTORY,
+		data: BICONOMY_DEFAULT_FALLBACK_HANDLER_CREATECALL,
+		gas: 15_000_000n,
+	}, "[BICONOMY] Default Fallback Handler");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: KERNEL_V06_ACCOUNT_V2_2_LOGIC_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[KERNEL] Deploying V0.6 Account V2 Logic"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: KERNEL_V06_ECDSA_VALIDATOR_V2_2_CREATECALL,
+		gas: 15_000_000n,
+	}, "[KERNEL] V0.6 ECDSA Validator");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: KERNEL_V06_FACTORY_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[KERNEL] Deploying V0.6 Factory"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: KERNEL_V06_ACCOUNT_V2_2_LOGIC_CREATECALL,
+		gas: 15_000_000n,
+	}, "[KERNEL] V0.6 Account V2 Logic");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: KERNEL_V07_FACTORY_V3_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[KERNEL] Deploying V0.7 Factory V3"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: KERNEL_V06_FACTORY_CREATECALL,
+		gas: 15_000_000n,
+	}, "[KERNEL] V0.6 Factory");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: KERNEL_V07_ECDSA_VALIDATOR_V3_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[KERNEL] Deploying V0.7 ECDSA VALIDATOR"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: KERNEL_V07_FACTORY_V3_CREATECALL,
+		gas: 15_000_000n,
+	}, "[KERNEL] V0.7 Factory V3");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: KERNEL_V07_ACCOUNT_V3_LOGIC_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[KERNEL] Deploying V0.7 ACCOUNT V3 LOGIC "));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: KERNEL_V07_ECDSA_VALIDATOR_V3_CREATECALL,
+		gas: 15_000_000n,
+	}, "[KERNEL] V0.7 ECDSA Validator");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: KERNEL_V07_META_FACTORY_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[KERNEL] Deploying V0.7 META FACTORY"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: KERNEL_V07_ACCOUNT_V3_LOGIC_CREATECALL,
+		gas: 15_000_000n,
+	}, "[KERNEL] V0.7 Account V3 Logic");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: KERNEL_V07_ACCOUNT_V3_1_LOGIC_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[KERNEL] Deploying V0.7 ACCOUNT V3_1 LOGIC "));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: KERNEL_V07_META_FACTORY_CREATECALL,
+		gas: 15_000_000n,
+	}, "[KERNEL] V0.7 Meta Factory");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: KERNEL_V07_FACTORY_V3_1_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() => console.log("[KERNEL] Deploying V0.7 Factory V3_1"));
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: KERNEL_V07_ACCOUNT_V3_1_LOGIC_CREATECALL,
+		gas: 15_000_000n,
+	}, "[KERNEL] V0.7 Account V3.1 Logic");
 
-	walletClient
-		.sendTransaction({
-			to: DETERMINISTIC_DEPLOYER,
-			data: LIGHT_ACCOUNT_FACTORY_V110_CREATECALL,
-			gas: 15_000_000n,
-			nonce: nonce++,
-			chain,
-		})
-		.then(() =>
-			console.log("[LIGHT ACCOUNT] Deploying v1.1.0 LightAccount Factory"),
-		);
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: KERNEL_V07_FACTORY_V3_1_CREATECALL,
+		gas: 15_000_000n,
+	}, "[KERNEL] V0.7 Factory V3.1");
 
-	let onchainNonce = 0;
-	do {
-		onchainNonce = await client.getTransactionCount({
-			address: walletClient.account.address,
-		});
-		await new Promise((resolve) => setTimeout(resolve, 500));
-	} while (onchainNonce !== nonce);
+	await sendAndWaitForTransaction({
+		to: DETERMINISTIC_DEPLOYER,
+		data: LIGHT_ACCOUNT_FACTORY_V110_CREATECALL,
+		gas: 15_000_000n,
+	}, "[LIGHT ACCOUNT] LightAccount Factory v1.1.0");
+
+	console.log("All contract deployments completed successfully!");
 
 	// ==== SETUP KERNEL V0.6 CONTRACTS ==== //
 	const kernelFactoryOwner = "0x9775137314fE595c943712B0b336327dfa80aE8A";
